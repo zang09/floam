@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
-<launch>
 
-    
-    <node pkg="rosbag" type="play" name="rosbag_play" args="--clock -r 0.5 $(env HOME)/Downloads/2011_09_30_0018.bag"/> 
-    
+<launch>        
     <!-- For Velodyne VLP-16 
     <param name="scan_line" value="16" />
     -->
@@ -13,17 +10,23 @@
     -->
 
     <!-- For Velodyne HDL-64 -->
-    <param name="scan_line" value="64" />
+    <!--param name="scan_line" value="64" /
+    -->
+
+    <!-- For OS0-128 -->
+    <param name="scan_line" value="128" />
     
     <!--- Sim Time -->
     <param name="/use_sim_time" value="true" />
     <param name="scan_period" value="0.1" />
 
-    <param name="vertical_angle" type="double" value="2.0" />
-    <param name="max_dis" type="double" value="90.0" />
-    <param name="map_resolution" type="double" value="0.4" />
+    <param name="vertical_angle" type="double" value="0.7" />
+    <param name="max_dis" type="double" value="50.0" />
     <param name="min_dis" type="double" value="3.0" />
-    <!--- -->
+    <param name="map_resolution" type="double" value="-1.0" />
+    <param name="save_directory" type="string" value="/home/haebeom" />
+
+    <!---Node-->
     <node pkg="floam" type="floam_odom_estimation_node" name="floam_odom_estimation_node" output="screen"/>
     <node pkg="floam" type="floam_laser_processing_node" name="floam_laser_processing_node" output="screen"/>
     <node pkg="floam" type="floam_laser_mapping_node" name="floam_laser_mapping_node" output="screen"/>

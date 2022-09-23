@@ -52,8 +52,11 @@ RUN cd src \
     && catkin_make
        
 # Load ROS environment at each run
-COPY ./ros_entrypoint.sh /
-RUN chmod 755 /ros_entrypoint.sh
-ENTRYPOINT ["/ros_entrypoint.sh"]
+#COPY ./ros_entrypoint.sh /
+#RUN chmod 755 /ros_entrypoint.sh
+#ENTRYPOINT ["/ros_entrypoint.sh"]
 
-CMD ["bash"]
+#CMD ["bash"]
+
+RUN echo "source /opt/ros/melodic/setup.bash" >> /root/.bashrc \
+    && echo "source /home/container/catkin_ws/devel/setup.bash" >> /root/.bashrc

@@ -51,6 +51,7 @@ class LaserMappingClass
 		int map_depth;
 		std::vector<std::vector<std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr>>> map;
 		pcl::VoxelGrid<pcl::PointXYZI> downSizeFilter;
+		bool downsample;
 		
 		void addWidthCellNegative(void);
 		void addWidthCellPositive(void);

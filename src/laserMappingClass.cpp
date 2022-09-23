@@ -28,7 +28,12 @@ void LaserMappingClass::init(double map_resolution){
 	map_depth = LASER_CELL_RANGE_HORIZONTAL*2+1;
 
 	//downsampling size
-	downSizeFilter.setLeafSize(map_resolution, map_resolution, map_resolution);
+	if(map_resolution < 0)
+		downsample = false;
+	else {
+		downsample = true;		
+		downSizeFilter.setLeafSize(map_resolution, map_resolution, map_resolution);
+	}
 }
 
 void LaserMappingClass::addWidthCellNegative(void){
@@ -171,18 +176,18 @@ void LaserMappingClass::updateCurrentPointsToMap(const pcl::PointCloud<pcl::Poin
 		
 	}
 	
-	//filtering points 
-	for(int i=currentPosIdX-LASER_CELL_RANGE_HORIZONTAL;i<currentPosIdX+LASER_CELL_RANGE_HORIZONTAL+1;i++){
-		for(int j=currentPosIdY-LASER_CELL_RANGE_HORIZONTAL;j<currentPosIdY+LASER_CELL_RANGE_HORIZONTAL+1;j++){
-			for(int k=currentPosIdZ-LASER_CELL_RANGE_VERTICAL;k<currentPosIdZ+LASER_CELL_RANGE_VERTICAL+1;k++){
-				downSizeFilter.setInputCloud(map[i][j][k]);
-				downSizeFilter.filter(*(map[i][j][k]));
+	//filtering points
+	if(downsample == true)
+	{
+		for(int i=currentPosIdX-LASER_CELL_RANGE_HORIZONTAL;i<currentPosIdX+LASER_CELL_RANGE_HORIZONTAL+1;i++){
+			for(int j=currentPosIdY-LASER_CELL_RANGE_HORIZONTAL;j<currentPosIdY+LASER_CELL_RANGE_HORIZONTAL+1;j++){
+				for(int k=currentPosIdZ-LASER_CELL_RANGE_VERTICAL;k<currentPosIdZ+LASER_CELL_RANGE_VERTICAL+1;k++){
+					downSizeFilter.setInputCloud(map[i][j][k]);
+					downSizeFilter.filter(*(map[i][j][k]));
+				}					
 			}
-				
 		}
-
 	}
-
 }
 
 pcl::PointCloud<pcl::PointXYZI>::Ptr LaserMappingClass::getMap(void){

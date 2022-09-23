@@ -49,8 +49,8 @@ void velodyneHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
 }
 
 
-void laser_mapping(){
-    while(1){
+void laser_mapping(std::string save_directory){
+    while(ros::ok()){
         if(!odometryBuf.empty() && !pointCloudBuf.empty()){
 
             //read data
@@ -98,6 +98,9 @@ void laser_mapping(){
         std::chrono::milliseconds dura(2);
         std::this_thread::sleep_for(dura);
     }
+
+    std::cout << "Save file at " << save_directory << "/map.pcd .." << std::endl;
+    pcl::io::savePCDFileBinary(save_directory + "/map.pcd", *laserMapping.getMap());
 }
 
 int main(int argc, char **argv)
@@ -111,13 +114,16 @@ int main(int argc, char **argv)
     double max_dis = 60.0;
     double min_dis = 2.0;
     double map_resolution = 0.4;
+    std::string save_directory;
+
     nh.getParam("/scan_period", scan_period); 
     nh.getParam("/vertical_angle", vertical_angle); 
     nh.getParam("/max_dis", max_dis);
     nh.getParam("/min_dis", min_dis);
     nh.getParam("/scan_line", scan_line);
     nh.getParam("/map_resolution", map_resolution);
-
+    nh.getParam("/save_directory", save_directory);
+    
     lidar_param.setScanPeriod(scan_period);
     lidar_param.setVerticalAngle(vertical_angle);
     lidar_param.setLines(scan_line);
@@ -125,13 +131,14 @@ int main(int argc, char **argv)
     lidar_param.setMinDistance(min_dis);
 
     laserMapping.init(map_resolution);
-    ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_points_filtered", 100, velodyneHandler);
+    ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/lidar_points_filtered", 100, velodyneHandler);
     ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>("/odom", 100, odomCallback);
 
     map_pub = nh.advertise<sensor_msgs::PointCloud2>("/map", 100);
-    std::thread laser_mapping_process{laser_mapping};
-
-    ros::spin();
-
+    std::thread laser_mapping_process(laser_mapping, save_directory);
+    
+    ros::spin();    
+    
+    laser_mapping_process.join();
     return 0;
 }

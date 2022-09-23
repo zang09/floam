@@ -57,6 +57,13 @@ void LaserProcessingClass::featureExtraction(const pcl::PointCloud<pcl::PointXYZ
                 continue;
             }
         }
+        else if (N_SCANS == 128) // For OS0-128
+        {   
+            scanID = round((angle + 45) * 90.0 / 127.0);
+
+            if (scanID > (N_SCANS - 1) || scanID < 0)
+                continue;
+        }
         else
         {
             printf("wrong scan number\n");
